@@ -1,0 +1,47 @@
+----------------------------------------------------------------------------------------------------------------------
+--##################################################################################################################--
+--###################################              CONSULTAS             ###########################################--
+--##################################################################################################################--
+----------------------------------------------------------------------------------------------------------------------
+
+
+--aircrafts_data (AIRCRAFT_CODE, model, range)
+--airports_data (AIRPORT_CODE, airport_name, city, coordinates, timezone);
+--boarding_passes (TICKET_NO -> ticket_flights.ticket_no, FLIGHT_ID -> ticket_flights.ticket_no, boarding, seat_no);
+--bookings (BOOK_REF, book_date, total_amount);
+--flights (FLIGHT_ID, flight_no, scheduled_departure, scheduled_arrival, departure_airport -> airports_data.airport_code , arrival_airport -> airports_data.airport_code,  
+          -- status, aircraft_code -> airports_data.airport_code , actual_departure, actual_arrival,);
+--seats (AIRCRAFT_CODE -> aircrafts_data.aircraft_code, SEAT_NO, fare_conditions);
+--ticket_flights (TICKET_NO -> tickets.ticket_no, FLIGHT_ID -> flights.flight_id, fare_conditions, amount);
+--tickets (TICKET_NO, book_ref -> bookings.book_ref, passenger_id, passenger_name, contact_data);
+
+
+
+
+--1) Lista el número de reservas (bookings) que contengan un billete de ida y vuelta
+--grupadas por aeropuerto. Un billete es de ida y vuelta si el aeropuerto de
+--origen del primer vuelo es idéntico al aeropuerto de destino del último vuelo.
+--El resultado mostrará dos columnas con el código del aeropuerto de salida ası́
+
+--como el número de reservas que contienen billetes de ida y vuelta para ese
+--aeropuerto. Igualmente, el resultado se ordenará de forma ascendente usando
+--el atributo (departure airport).
+
+
+SELECT a.airport_code, count()
+FROM (((BOOKINGS b  JOIN TICKETS t ON b.book_ref = t.book_ref) JOIN TICKET_FLIGHTS tf ON t.ticket_no = tf.ticket_no) JOIN FLIGHTS f ON tf.flight_id = f.flight_id), AIRPORT_DATA a
+GROUP BY a.airport_code, a.airport_name
+WHERE
+        f1.scheduled_departure = ((SELECT MIN(f2.scheduled_departure)) 
+            FROM FLIGHTS f2
+            WHERE f2.flight_id = tf-flight_id)
+
+        AND 
+
+        f3.scheduled_departure =   ((SELECT MIN(f4.scheduled_departure)) 
+            FROM FLIGHTS f4
+            WHERE f4.flight_id = tf-flight_id)
+
+        AND
+
+        f1.departure_airport = f3.arrival_airport = a.airport_code
