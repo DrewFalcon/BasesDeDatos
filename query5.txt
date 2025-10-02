@@ -1,0 +1,16 @@
+-- Muestra reservas(Bookings) para los cuales no se haya emitido alguna de las tarjetas de
+-- embarque (boarding_passes). La salida debe mostrar los atributos << book ref >> y flight id. Ordenar
+-- el resultado de forma ascendiente por la pareja (book ref, flight id).
+
+
+
+SELECT b.book_ref, f.flight_id
+FROM public.bookings b 
+JOIN public.tickets t ON b.book_ref = t.book_ref
+JOIN public.ticket_flights tf ON t.ticket_no = tf.ticket_no
+JOIN public.flights 
+
+WHERE (
+    SELECT bp.ticket_no
+    FROM public.boarding_passes bp
+) != tf.ticket_no

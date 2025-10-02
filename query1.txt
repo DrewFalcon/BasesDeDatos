@@ -1,0 +1,25 @@
+SELECT a.airport_code 
+FROM public.bookings b  
+JOIN public.tickets t ON b.book_ref = t.book_ref 
+JOIN public.ticket_flights tf ON t.ticket_no = tf.ticket_no 
+JOIN public.flights f ON tf.flight_id = f.flight_id 
+JOIN public.airports_data a ON f.departure_airport = a.airport_code
+WHERE
+        (
+            SELECT MIN(f2_min.scheduled_departure)
+            FROM public.flights f2_min
+            JOIN public.ticket_flights tf2_min ON f2_min.flight_id = tf2_min.flight_id
+            WHERE tf2_min.ticket_no = t.ticket_no
+        ) =
+
+        (
+            SELECT MAX(f3_max.scheduled_departure) 
+            FROM public.flights f3_max
+            JOIN public.ticket_flights tf2_min ON f3_max.flight_id = tf2_min.flight_id
+            WHERE tf2_min.ticket_no = t.ticket_no
+        )
+
+
+GROUP BY a.airport_code, f.departure_airport
+ORDER BY f.departure_airport DESC   
+

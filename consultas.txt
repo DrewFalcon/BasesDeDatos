@@ -1,0 +1,79 @@
+----------------------------------------------------------------------------------------------------------------------
+--##################################################################################################################--
+--###################################             CONTRASEÑA             ###########################################--
+--##################################################################################################################--
+----------------------------------------------------------------------------------------------------------------------
+
+--alumnodb
+--alumnodb
+
+--localhost
+
+----------------------------------------------------------------------------------------------------------------------
+--##################################################################################################################--
+--###################################              CONSULTAS             ###########################################--
+--##################################################################################################################--
+----------------------------------------------------------------------------------------------------------------------
+
+
+--aircrafts_data (aircraft_code, model, range)
+--airports_data (airport_code, airport_name, city, coordinates, timezone);
+--boarding_passes (ticket_no -> ticket_flights.ticket_no, flight_id -> ticket_flights.ticket_no, boarding_no, seat_no);
+--bookings (book_ref, book_date, total_amount);
+--seats (aircraft_code -> aircrafts_data.aircraft_code, seat_no, fare_conditions);
+--ticket_flights (ticket_no -> tickets.ticket_no, flight_no -> flights.flight_id, fare_conditions, amount);
+--tickets (ticket_no, book_ref -> bookings.book_ref, passenger_id, passenger_name, contact_data);
+--flights (flight_id, flight_no, scheduled_departure, scheduled_arrival, departure_airport -> airports_data.airport_code , arrival_airport -> airports_data.airport_code,  status, aircraft_code -> airports_data.airport_code , actual_departure, actual_arrival);
+
+
+
+
+
+--1) Lista el número de reservas (bookings) que contengan un billete de ida y vuelta
+--grupadas por aeropuerto. Un billete es de ida y vuelta si el aeropuerto de
+--origen del primer vuelo es idéntico al aeropuerto de destino del último vuelo.
+--El resultado mostrará dos columnas con el código del aeropuerto de salida ası́
+
+--como el número de reservas que contienen billetes de ida y vuelta para ese
+--aeropuerto. Igualmente, el resultado se ordenará de forma ascendente usando
+--el atributo (departure airport).
+
+
+SELECT a.airport_code 
+FROM (((BOOKINGS b  JOIN TICKETS t ON b.book_ref = t.book_ref) JOIN TICKET_FLIGHTS tf ON t.ticket_no = tf.ticket_no) JOIN FLIGHTS f ON tf.flight_id = f.flight_id) JOIN AIRPORT_DATA a ON f.departure_airport = a.airport_code
+WHERE
+        (
+            SELECT MIN(f2_min.scheduled_departure)
+            FROM FLIGHTS f2_min
+            JOIN TICKET_FLIGHTS tf2_min ON f2_min.flight_id = tf2_min.flight_id
+            WHERE tf_min.ticket_no = t.ticket_no
+        ) =
+
+        (
+            SELECT MAX(f3_max.scheduled_departure) 
+            FROM FLIGHTS f3_max
+            JOIN TICKET_FLIGHTS tf2_min ON f3_max.flight_id = tf2_min.flight_id
+            WHERE tf_min.ticket_no = t.ticket_no
+        )
+
+
+GROUP BY a.airport_code, a.airport_name
+ORDER BY f.departure_airport DESC   
+
+
+
+--3. Crea una consulta que muestre por pantalla el codigo de aeropuerto y el numero
+--   de pasajeros recibidos, y ordena la misma de forma ascendiente por el numero de pasajeros recibidos. 
+
+--   Se considera que un pasajero ha volado al aeropuerto si se ha emitido una tarjeta de embarque. 
+--   Una tarjeta de embarque para un
+--   vuelo del aeropuerto X al Y incrementa en 1 el numero de pasajeros recibidos
+--   en el aeropuerto Y .
+
+SELECT a.airport_code, COUNT(b.boarding_no) as num_passen
+FROM AIRPORT_DATA a JOIN FLIGHTS f ON a.airport_code = f.arrival_airport 
+JOIN ticket_flights tf ON tf.flight_no = f.flight_id 
+JOIN boarding_passes b ON b.ticket_no = tf.ticket_no
+
+GROUP BY a.airport_code
+ORDER BY num_passen DESC;
