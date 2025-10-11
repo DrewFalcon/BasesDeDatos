@@ -1,5 +1,6 @@
 # Version 1.0
 # Por lo general no se requiere modificar el fichero
+# Formateador usado: http://www.dpriver.com/pp/sqlformat.htm
 
 export PGDATABASE:=flight
 export PGUSER :=alumnodb

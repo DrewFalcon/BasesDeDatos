@@ -8,9 +8,6 @@ SELECT b.book_ref, f.flight_id
 FROM public.bookings b 
 JOIN public.tickets t ON b.book_ref = t.book_ref
 JOIN public.ticket_flights tf ON t.ticket_no = tf.ticket_no
-JOIN public.flights 
+LEFT JOIN public.boarding_passes bp ON tf.ticket_no = bp.ticket_no AND tf.flight_id = bp.flight_id
 
-WHERE (
-    SELECT bp.ticket_no
-    FROM public.boarding_passes bp
-) != tf.ticket_no
+WHERE bp.ticket_no IS NULL
