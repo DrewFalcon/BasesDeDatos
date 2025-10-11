@@ -1,0 +1,14 @@
+WITH flight_delays
+     AS (SELECT flight_no,
+                Avg(Extract(epoch FROM ( actual_arrival - scheduled_arrival )) /
+                    60)
+                AS
+                avg_delay_minutes
+         FROM   flights
+         WHERE  actual_arrival IS NOT NULL
+         GROUP  BY flight_no)
+SELECT flight_no,
+       avg_delay_minutes
+FROM   flight_delays
+WHERE  avg_delay_minutes = (SELECT Max(avg_delay_minutes)
+                            FROM   flight_delays); 
