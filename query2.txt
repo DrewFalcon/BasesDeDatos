@@ -1,11 +1,11 @@
-SELECT   b.book_ref,
-         b.total_amount,
-         Sum(tf.amount) AS calculated_amount
-FROM     bookings b
-JOIN     tickets t
-ON       b.book_ref = t.book_ref
-JOIN     ticket_flights tf
-ON       t.ticket_no = tf.ticket_no
-GROUP BY b.book_ref,
-         b.total_amount
-group BY b.book_ref ASC;
+SELECT b.book_ref,
+       b.total_amount,
+       Sum(tf.amount) AS calculated_amount
+FROM   PUBLIC.bookings b
+       JOIN tickets t
+         ON b.book_ref = t.book_ref
+       JOIN ticket_flights tf
+         ON t.ticket_no = tf.ticket_no
+GROUP  BY b.book_ref,
+          b.total_amount
+ORDER  BY b.book_ref ASC;  
