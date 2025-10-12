@@ -8,7 +8,7 @@
                 JOIN PUBLIC.flights f
                   ON tf.flight_id = f.flight_id
          ORDER  BY tf.ticket_no,
-                   f.departure_airport ASC,
+                   f.scheduled_departure ASC,
                    f.flight_id ASC),
      last_tickets
      AS (SELECT DISTINCT ON (tf.ticket_no) tf.ticket_no,
@@ -19,7 +19,7 @@
                 JOIN PUBLIC.flights f
                   ON tf.flight_id = f.flight_id
          ORDER  BY tf.ticket_no,
-                   f.departure_airport DESC,
+                   f.scheduled_departure DESC,
                    f.flight_id DESC),
      first_and_lasts
      AS (SELECT f.ticket_no,
