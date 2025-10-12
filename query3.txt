@@ -1,8 +1,11 @@
-SELECT a.airport_code, COUNT(b.boarding_no) as num_passen
-FROM public.airports_data a 
-JOIN public.FLIGHTS f ON a.airport_code = f.arrival_airport 
-JOIN public.ticket_flights tf ON tf.flight_id = f.flight_id 
-JOIN public.boarding_passes b ON b.ticket_no = tf.ticket_no
-
-GROUP BY a.airport_code
-ORDER BY num_passen ASC;
+SELECT a.airport_code,
+       Count(b.boarding_no) AS num_passen
+FROM   PUBLIC.airports_data a
+       JOIN PUBLIC.flights f
+         ON a.airport_code = f.arrival_airport
+       JOIN PUBLIC.ticket_flights tf
+         ON tf.flight_id = f.flight_id
+       JOIN PUBLIC.boarding_passes b
+         ON b.ticket_no = tf.ticket_no
+GROUP  BY a.airport_code
+ORDER  BY num_passen ASC;  
