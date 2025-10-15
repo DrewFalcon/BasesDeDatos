@@ -1,2 +1,19 @@
---610 con 2 columnas
-
+WITH flight_vacancies AS (
+    SELECT 
+        f.flight_id,
+        COUNT(s.seat_no) - COUNT(bp.seat_no) AS empty_seats
+    FROM flights f
+    JOIN seats s 
+        ON f.aircraft_code = s.aircraft_code
+    LEFT JOIN boarding_passes bp 
+        ON f.flight_id = bp.flight_id
+        AND s.seat_no = bp.seat_no
+    GROUP BY f.flight_id
+)
+SELECT 
+    flight_id,
+    empty_seats
+FROM flight_vacancies
+WHERE empty_seats = (
+    SELECT MAX(empty_seats) FROM flight_vacancies
+);
